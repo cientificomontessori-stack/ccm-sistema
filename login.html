@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CCM — Iniciar sesión</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <style>
+    /* ── Tokens institucionales CCM ── */
+    :root {
+      --azul:           #131143;
+      --azul-hover:     #0b0a2b;
+      --azul-tint:      #eeedf5;
+      --dorado:         #c4922a;
+      --dorado-soft:    #f7edda;
+      --burdeos:        #6c2921;
+      --burdeos-soft:   #faeaea;
+      --fondo:          #f8f7f5;
+      --superficie:     #ffffff;
+      --superficie-alt: #f3f2f0;
+      --borde:          #e6e4e1;
+      --texto:          #1a1831;
+      --texto-suave:    #6b6880;
+      --error:          #6c2921;
+      --error-bg:       #fce8e7;
+      --font-display:   'Libre Baskerville', Georgia, serif;
+      --font-body:      'Inter', system-ui, sans-serif;
+      --radius:         8px;
+      --radius-lg:      12px;
+      --shadow-sm:      0 1px 4px rgba(19,17,67,.07);
+      --shadow-md:      0 4px 24px rgba(19,17,67,.13);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--fondo);
+      color: var(--texto);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Franja decorativa superior ── */
+    .top-stripe {
+      height: 3px;
+      background: linear-gradient(90deg, var(--burdeos), var(--dorado), var(--burdeos));
+      flex-shrink: 0;
+    }
+
+    /* ── Contenedor principal ── */
+    .page {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: calc(100vh - 3px);
+    }
+
+    /* ── Panel izquierdo — institucional ── */
+    .panel-izq {
+      background: var(--azul);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 48px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Ornamento de fondo */
+    .panel-izq::before {
+      content: '';
+      position: absolute;
+      bottom: -80px; right: -80px;
+      width: 360px; height: 360px;
+      border-radius: 50%;
+      border: 1px solid rgba(196,146,42,.12);
+    }
+    .panel-izq::after {
+      content: '';
+      position: absolute;
+      bottom: -120px; right: -120px;
+      width: 480px; height: 480px;
+      border-radius: 50%;
+      border: 1px solid rgba(196,146,42,.07);
+    }
+
+    .brand {
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .brand-escudo {
+      width: 64px; height: 64px;
+      background: rgba(196,146,42,.15);
+      border: 1.5px solid rgba(196,146,42,.35);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 24px;
+    }
+    .brand-escudo i { color: var(--dorado); }
+
+    .brand-eyebrow {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--dorado);
+      margin-bottom: 10px;
+    }
+
+    .brand-nombre {
+      font-family: var(--font-display);
+      font-size: clamp(18px, 2.2vw, 24px);
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.25;
+      margin-bottom: 8px;
+    }
+
+    .brand-sub {
+      font-size: 12px;
+      color: rgba(255,255,255,.42);
+      line-height: 1.6;
+      max-width: 260px;
+      margin: 0 auto;
+    }
+
+    /* Separador dorado */
+    .brand-sep {
+      width: 36px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--dorado), transparent);
+      margin: 20px auto;
+    }
+
+    .brand-info {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .brand-info-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: rgba(255,255,255,.5);
+      font-size: 11px;
+    }
+    .brand-info-item i { color: rgba(196,146,42,.6); flex-shrink: 0; }
+
+    /* ── Panel derecho — formulario ── */
+    .panel-der {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 24px;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 380px;
+    }
+
+    .login-header {
+      margin-bottom: 28px;
+    }
+
+    .login-titulo {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--azul);
+      line-height: 1.2;
+      margin-bottom: 4px;
+    }
+
+    .login-subtitulo {
+      font-size: 13px;
+      color: var(--texto-suave);
+    }
+
+    /* ── Formulario ── */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--texto);
+      margin-bottom: 6px;
+      letter-spacing: 0.2px;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--texto-suave);
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-wrap input {
+      width: 100%;
+      padding: 10px 12px 10px 38px;
+      border: 1.5px solid var(--borde);
+      border-radius: var(--radius);
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--texto);
+      background: var(--superficie);
+      transition: border-color .2s, box-shadow .2s;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    .input-wrap input::placeholder {
+      color: #b8b6c8;
+    }
+
+    .input-wrap input:focus {
+      border-color: var(--azul);
+      box-shadow: 0 0 0 3px rgba(19,17,67,.08);
+    }
+
+    .input-wrap input.error {
+      border-color: var(--burdeos);
+    }
+
+    /* Toggle contraseña */
+    .toggle-pass {
+      position: absolute;
+      right: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--texto-suave);
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      border-radius: 4px;
+      transition: color .15s;
+    }
+    .toggle-pass:hover { color: var(--azul); }
+
+    /* ── Mensaje de error ── */
+    .msg-error {
+      display: none;
+      align-items: flex-start;
+      gap: 8px;
+      background: var(--error-bg);
+      border: 1px solid rgba(108,41,33,.2);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      margin-bottom: 16px;
+      font-size: 12.5px;
+      color: var(--error);
+      line-height: 1.4;
+    }
+    .msg-error.visible { display: flex; }
+    .msg-error i { flex-shrink: 0; margin-top: 1px; }
+
+    /* ── Botón principal ── */
+    .btn-login {
+      width: 100%;
+      padding: 11px 20px;
+      background: var(--azul);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s, transform .1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .btn-login:hover:not(:disabled) {
+      background: var(--azul-hover);
+    }
+
+    .btn-login:active:not(:disabled) {
+      transform: scale(.99);
+    }
+
+    .btn-login:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+
+    /* Spinner */
+    .spinner {
+      display: none;
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .btn-login.loading .spinner { display: block; }
+    .btn-login.loading .btn-label { display: none; }
+
+    /* ── Footer del formulario ── */
+    .login-footer {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--borde);
+      text-align: center;
+    }
+
+    .login-footer p {
+      font-size: 11px;
+      color: var(--texto-suave);
+      line-height: 1.5;
+    }
+
+    .login-footer strong {
+      color: var(--azul);
+    }
+
+    /* ── Footer de página ── */
+    .page-footer {
+      text-align: center;
+      padding: 14px;
+      font-size: 10.5px;
+      color: #bbb;
+      border-top: 1px solid var(--borde);
+      background: var(--superficie);
+    }
+
+    /* ── Responsivo: móvil ── */
+    @media (max-width: 680px) {
+      .page {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+      }
+
+      .panel-izq {
+        padding: 28px 24px;
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 16px;
+      }
+
+      .panel-izq::before,
+      .panel-izq::after { display: none; }
+
+      .brand { text-align: left; }
+
+      .brand-escudo { margin: 0; width: 48px; height: 48px; flex-shrink: 0; }
+
+      .brand-eyebrow { font-size: 9px; margin-bottom: 4px; }
+
+      .brand-nombre { font-size: 15px; margin-bottom: 0; }
+
+      .brand-sub,
+      .brand-sep,
+      .brand-info { display: none; }
+
+      .panel-der {
+        padding: 28px 20px;
+        justify-content: flex-start;
+      }
+
+      .login-card { max-width: 100%; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .spinner { animation: none; }
+      * { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-stripe"></div>
+
+  <div class="page">
+
+    <!-- ── Panel institucional ── -->
+    <div class="panel-izq">
+      <div class="brand">
+        <div class="brand-escudo">
+          <i data-lucide="graduation-cap" width="28" height="28"></i>
+        </div>
+        <div class="brand-eyebrow">Sistema de Gestión Escolar</div>
+        <div class="brand-nombre">Colegio Científico<br>Montessori</div>
+        <div class="brand-sep"></div>
+        <div class="brand-sub">Plataforma administrativa para la gestión académica y financiera del ciclo escolar.</div>
+
+        <div class="brand-info">
+          <div class="brand-info-item">
+            <i data-lucide="shield-check" width="14" height="14"></i>
+            Acceso restringido a personal autorizado
+          </div>
+          <div class="brand-info-item">
+            <i data-lucide="lock" width="14" height="14"></i>
+            Sesión segura con verificación de rol
+          </div>
+          <div class="brand-info-item">
+            <i data-lucide="calendar" width="14" height="14"></i>
+            Ciclo escolar 2025
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Panel formulario ── -->
+    <div class="panel-der">
+      <div class="login-card">
+
+        <div class="login-header">
+          <div class="login-titulo">Iniciar sesión</div>
+          <div class="login-subtitulo">Ingrese sus credenciales para continuar</div>
+        </div>
+
+        <!-- Mensaje de error -->
+        <div class="msg-error" id="msgError" role="alert">
+          <i data-lucide="alert-circle" width="15" height="15"></i>
+          <span id="msgErrorTexto">Usuario o contraseña incorrectos.</span>
+        </div>
+
+        <!-- Campo usuario -->
+        <div class="form-group">
+          <label for="usuario">Usuario</label>
+          <div class="input-wrap">
+            <span class="input-icon"><i data-lucide="user" width="15" height="15"></i></span>
+            <input
+              type="text"
+              id="usuario"
+              name="usuario"
+              placeholder="Ingrese su usuario"
+              autocomplete="username"
+              autocapitalize="none"
+              spellcheck="false"
+            >
+          </div>
+        </div>
+
+        <!-- Campo contraseña -->
+        <div class="form-group">
+          <label for="contrasena">Contraseña</label>
+          <div class="input-wrap">
+            <span class="input-icon"><i data-lucide="key-round" width="15" height="15"></i></span>
+            <input
+              type="password"
+              id="contrasena"
+              name="contrasena"
+              placeholder="••••••••"
+              autocomplete="current-password"
+            >
+            <button type="button" class="toggle-pass" id="togglePass" title="Mostrar/ocultar contraseña" aria-label="Mostrar contraseña">
+              <i data-lucide="eye" width="15" height="15" id="iconoOjo"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Botón -->
+        <button class="btn-login" id="btnLogin" type="button">
+          <div class="spinner"></div>
+          <span class="btn-label">Ingresar</span>
+        </button>
+
+        <div class="login-footer">
+          <p>¿Olvidó su contraseña? Contacte a <strong>Dirección</strong> para restablecerla.</p>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <div class="page-footer">
+    CCM · Colegio Científico Montessori · Sistema de Gestión Escolar &nbsp;·&nbsp; v1.0
+  </div>
+
+  <script>
+    // ── Configuración Supabase ──────────────────────────────────────
+    // TODO: reemplazar con tus valores reales antes de subir a GitHub
+    const SUPABASE_URL = 'https://TU-PROYECTO.supabase.co';
+    const SUPABASE_KEY = 'TU-ANON-KEY';
+
+    // ── Inicializar íconos Lucide ──────────────────────────────────
+    lucide.createIcons();
+
+    // ── Referencias DOM ───────────────────────────────────────────
+    const inputUsuario  = document.getElementById('usuario');
+    const inputPass     = document.getElementById('contrasena');
+    const btnLogin      = document.getElementById('btnLogin');
+    const msgError      = document.getElementById('msgError');
+    const msgErrorTexto = document.getElementById('msgErrorTexto');
+    const togglePass    = document.getElementById('togglePass');
+    const iconoOjo      = document.getElementById('iconoOjo');
+
+    // ── Toggle mostrar/ocultar contraseña ─────────────────────────
+    togglePass.addEventListener('click', () => {
+      const visible = inputPass.type === 'text';
+      inputPass.type = visible ? 'password' : 'text';
+      iconoOjo.setAttribute('data-lucide', visible ? 'eye' : 'eye-off');
+      lucide.createIcons();
+    });
+
+    // ── Limpiar error al escribir ──────────────────────────────────
+    [inputUsuario, inputPass].forEach(el => {
+      el.addEventListener('input', () => {
+        msgError.classList.remove('visible');
+        el.classList.remove('error');
+      });
+    });
+
+    // ── Enter para enviar ──────────────────────────────────────────
+    inputPass.addEventListener('keydown', e => {
+      if (e.key === 'Enter') iniciarSesion();
+    });
+    inputUsuario.addEventListener('keydown', e => {
+      if (e.key === 'Enter') inputPass.focus();
+    });
+
+    // ── Mostrar error ──────────────────────────────────────────────
+    function mostrarError(texto) {
+      msgErrorTexto.textContent = texto;
+      msgError.classList.add('visible');
+      inputUsuario.classList.add('error');
+      inputPass.classList.add('error');
+      inputUsuario.focus();
+    }
+
+    // ── Estado loading ─────────────────────────────────────────────
+    function setLoading(on) {
+      btnLogin.disabled = on;
+      btnLogin.classList.toggle('loading', on);
+    }
+
+    // ── Función principal de login ─────────────────────────────────
+    async function iniciarSesion() {
+      const usuario    = inputUsuario.value.trim();
+      const contrasena = inputPass.value;
+
+      // Validaciones básicas del lado cliente
+      if (!usuario) {
+        mostrarError('Ingrese su nombre de usuario.');
+        inputUsuario.focus();
+        return;
+      }
+      if (!contrasena) {
+        mostrarError('Ingrese su contraseña.');
+        inputPass.focus();
+        return;
+      }
+
+      setLoading(true);
+      msgError.classList.remove('visible');
+
+      try {
+        // Llamada a la función RPC de autenticación en Supabase
+        // Esta RPC verifica bcrypt y devuelve el token de sesión + rol
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/ccm_login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`
+          },
+          body: JSON.stringify({ p_usuario: usuario, p_contrasena: contrasena })
+        });
+
+        const data = await res.json();
+
+        // Si Supabase retorna error HTTP
+        if (!res.ok) {
+          mostrarError('Error de conexión. Intente nuevamente.');
+          return;
+        }
+
+        // La RPC devuelve null si las credenciales son incorrectas
+        if (!data || data.error) {
+          mostrarError('Usuario o contraseña incorrectos.');
+          inputPass.value = '';
+          return;
+        }
+
+        // ✅ Login exitoso — guardar sesión y redirigir
+        sessionStorage.setItem('ccm_token',  data.token);
+        sessionStorage.setItem('ccm_rol',    data.rol);
+        sessionStorage.setItem('ccm_nombre', data.nombre);
+        sessionStorage.setItem('ccm_uid',    data.usuario_id);
+
+        // Redirigir al dashboard según el rol
+        const rutas = {
+          'administrador': 'dashboard-admin.html',
+          'secretaria':    'dashboard-secretaria.html',
+          'maestro':       'dashboard-maestro.html',
+          'padre':         'dashboard-padre.html'
+        };
+
+        const destino = rutas[data.rol] || 'dashboard.html';
+        window.location.href = destino;
+
+      } catch (err) {
+        console.error('[CCM] Error de login:', err);
+        mostrarError('No se pudo conectar. Verifique su conexión a internet.');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    // ── Asignar acción al botón ────────────────────────────────────
+    btnLogin.addEventListener('click', iniciarSesion);
+
+    // ── Foco automático en usuario al cargar ───────────────────────
+    inputUsuario.focus();
+
+    // ── Verificar si ya hay sesión activa ─────────────────────────
+    // (Evita que alguien vea el login si ya inició sesión)
+    (function verificarSesionExistente() {
+      const token = sessionStorage.getItem('ccm_token');
+      const rol   = sessionStorage.getItem('ccm_rol');
+      if (token && rol) {
+        // Hay sesión guardada — redirigir directo
+        const rutas = {
+          'administrador': 'dashboard-admin.html',
+          'secretaria':    'dashboard-secretaria.html',
+          'maestro':       'dashboard-maestro.html',
+          'padre':         'dashboard-padre.html'
+        };
+        window.location.href = rutas[rol] || 'dashboard.html';
+      }
+    })();
+  </script>
+
+</body>
+</html>
