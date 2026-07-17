@@ -504,8 +504,8 @@
   <script>
     // ── Configuración Supabase ──────────────────────────────────────
     // TODO: reemplazar con tus valores reales antes de subir a GitHub
-    const SUPABASE_URL = 'https://TU-PROYECTO.supabase.co';
-    const SUPABASE_KEY = 'TU-ANON-KEY';
+    const SUPABASE_URL = 'https://szrkgbwpxhivkddopsei.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6cmtnYndweGhpdmtkZG9wc2VpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzMDIwMzIsImV4cCI6MjA5OTg3ODAzMn0.skcs2dPtsKH3R6wzw3e7Ma292EOah9Y9UDW6C47LfuY';
 
     // ── Inicializar íconos Lucide ──────────────────────────────────
     lucide.createIcons();
@@ -581,14 +581,14 @@
       try {
         // Llamada a la función RPC de autenticación en Supabase
         // Esta RPC verifica bcrypt y devuelve el token de sesión + rol
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/ccm_login`, {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'apikey': SUPABASE_KEY,
             'Authorization': `Bearer ${SUPABASE_KEY}`
           },
-          body: JSON.stringify({ p_usuario: usuario, p_contrasena: contrasena })
+          body: JSON.stringify({ p_usuario: usuario, p_password: contrasena })
         });
 
         const data = await res.json();
@@ -610,7 +610,6 @@
         sessionStorage.setItem('ccm_token',  data.token);
         sessionStorage.setItem('ccm_rol',    data.rol);
         sessionStorage.setItem('ccm_nombre', data.nombre);
-        sessionStorage.setItem('ccm_uid',    data.usuario_id);
 
         // Redirigir al dashboard según el rol
         const rutas = {
